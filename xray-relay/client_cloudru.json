@@ -1,7 +1,14 @@
 {
-  "remarks": "CLOUD.RU RELAY",
+  "remarks": "relclru235.promsoftservice.ru ws tls fallback",
   "log": {
     "loglevel": "warning"
+  },
+  "dns": {
+    "queryStrategy": "UseIPv4",
+    "servers": [
+      "https://1.1.1.1/dns-query",
+      "localhost"
+    ]
   },
   "inbounds": [
     {
@@ -10,14 +17,15 @@
       "port": 10808,
       "protocol": "socks",
       "settings": {
-        "udp": true
+        "auth": "noauth",
+        "udp": false,
+        "userLevel": 8
       },
       "sniffing": {
         "enabled": true,
         "destOverride": [
           "http",
-          "tls",
-          "quic"
+          "tls"
         ]
       }
     },
@@ -26,7 +34,16 @@
       "listen": "127.0.0.1",
       "port": 10809,
       "protocol": "http",
-      "settings": {}
+      "settings": {
+        "userLevel": 8
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
     }
   ],
   "outbounds": [
@@ -40,53 +57,76 @@
             "port": 443,
             "users": [
               {
-                "id": "26a03255-1531-4fb9-9577-d2be076d1d31",
-                "encryption": "none"
+                "id": "ba2d521b-5e9f-45d5-8b77-f0c281d30ebe",
+                "encryption": "none",
+                "security": "auto",
+                "level": 8
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "xhttp",
+        "network": "ws",
         "security": "tls",
         "tlsSettings": {
           "serverName": "relclru235.promsoftservice.ru",
           "fingerprint": "chrome",
+          "allowInsecure": false,
           "alpn": [
-            "h3",
-            "h2",
             "http/1.1"
           ]
         },
-        "xhttpSettings": {
-          "path": "/api/v1/messages/",
-          "mode": "auto",
-          "extra": {
-            "headers": {
-              "User-Agent": "Mozilla/5.0",
-              "Accept": "*/*",
-              "Referer": "https://relclru235.promsoftservice.ru/"
-            },
-            "xPaddingBytes": "100-800"
+        "wsSettings": {
+          "path": "/api/messages/v1",
+          "headers": {
+            "Host": "relclru235.promsoftservice.ru"
           }
         }
+      },
+      "mux": {
+        "enabled": false,
+        "concurrency": -1,
+        "xudpConcurrency": 8,
+        "xudpProxyUDP443": ""
       }
     },
     {
       "tag": "direct",
-      "protocol": "freedom"
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
     },
     {
       "tag": "block",
-      "protocol": "blackhole"
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
     }
   ],
-  "dns": {
-    "servers": [
-      "https://1.1.1.1/dns-query",
-      "localhost"
-    ],
-    "queryStrategy": "UseIPv4"
-  }
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      },
+      "8": {
+        "connIdle": 300,
+        "downlinkOnly": 1,
+        "handshake": 4,
+        "uplinkOnly": 1
+      }
+    },
+    "system": {
+      "statsInboundDownlink": true,
+      "statsInboundUplink": true,
+      "statsOutboundDownlink": true,
+      "statsOutboundUplink": true
+    }
+  },
+  "stats": {}
 }

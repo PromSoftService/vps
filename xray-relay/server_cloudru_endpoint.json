@@ -3,29 +3,30 @@
     "loglevel": "warning"
   },
   "dns": {
+    "queryStrategy": "UseIPv4",
     "servers": [
-      "https://1.1.1.1/dns-query"
+      "https://1.1.1.1/dns-query",
+      "localhost"
     ]
   },
   "inbounds": [
     {
-      "tag": "in-vless-xhttp",
+      "tag": "in-vless-ws",
       "listen": "0.0.0.0",
       "port": 10000,
       "protocol": "vless",
       "settings": {
         "clients": [
           {
-            "id": "d5fc69a9-a4b1-4502-a35b-cf44548b2358"
+            "id": "ba2d521b-5e9f-45d5-8b77-f0c281d30ebe"
           }
         ],
         "decryption": "none"
       },
       "streamSettings": {
-        "network": "xhttp",
-        "xhttpSettings": {
-          "path": "/api/v1/messages/",
-          "mode": "auto", "extra": {"headers":{"User-Agent":"Mozilla/5.0","Accept":"*/*","Referer":"https://relclru235.promsoftservice.ru/"},"xPaddingBytes":"100-800"}
+        "network": "ws",
+        "wsSettings": {
+          "path": "/api/messages/v1"
         }
       }
     }
@@ -33,7 +34,10 @@
   "outbounds": [
     {
       "tag": "direct",
-      "protocol": "freedom"
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
     },
     {
       "tag": "block",

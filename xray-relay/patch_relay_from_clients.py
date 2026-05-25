@@ -17,6 +17,8 @@ from typing import Any, Dict, List, Optional
 GENERATED_PREFIX = "relay-"
 BALANCER_TAG = "relay-balancer"
 RULE_MARKER = "__relay_generated__"
+DEFAULT_OBSERVATORY_PROBE_URL = "https://www.google.com/generate_204"
+DEFAULT_OBSERVATORY_PROBE_INTERVAL = "10s"
 
 
 def load_json(path: str) -> Dict[str, Any]:
@@ -245,6 +247,20 @@ def remove_generated_routing(config: Dict[str, Any]) -> None:
     ]
 
 
+def add_generated_observatory(
+    config: Dict[str, Any],
+    relay_outbound_tags: List[str],
+    probe_url: str,
+    probe_interval: str,
+) -> None:
+    config["observatory"] = {
+        "subjectSelector": relay_outbound_tags,
+        "probeUrl": probe_url,
+        "probeInterval": probe_interval,
+        "enableConcurrency": True,
+    }
+
+
 def add_generated_routing(
     config: Dict[str, Any],
     relay_outbound_tags: List[str],
@@ -257,7 +273,7 @@ def add_generated_routing(
     balancer: Dict[str, Any] = {
         "tag": BALANCER_TAG,
         "selector": relay_outbound_tags,
-        "strategy": {"type": "roundRobin"},
+        "strategy": {"type": "leastPing"},
     }
     balancers.append(balancer)
 
@@ -276,6 +292,8 @@ def patch_relay_config(
     relay_server_config: Dict[str, Any],
     endpoint_client_configs: List[Dict[str, Any]],
     apply_to_inbounds: Optional[List[str]],
+    probe_url: str = DEFAULT_OBSERVATORY_PROBE_URL,
+    probe_interval: str = DEFAULT_OBSERVATORY_PROBE_INTERVAL,
 ) -> Dict[str, Any]:
     if len(endpoint_client_configs) != 2:
         raise ValueError("exactly 2 endpoint client configs are required")
@@ -306,6 +324,14 @@ def patch_relay_config(
     outbounds.extend(relay_outbounds)
 
     relay_tags = [ob["tag"] for ob in relay_outbounds]
+
+    add_generated_observatory(
+        patched,
+        relay_tags,
+        probe_url=probe_url,
+        probe_interval=probe_interval,
+    )
+
     add_generated_routing(
         patched,
         relay_tags,
@@ -350,6 +376,18 @@ def parse_args() -> argparse.Namespace:
              "Default: all relay server inbound tags.",
     )
     parser.add_argument(
+        "--probe-url",
+        default=DEFAULT_OBSERVATORY_PROBE_URL,
+        help="URL used by observatory to probe relay outbounds. "
+             f"Default: {DEFAULT_OBSERVATORY_PROBE_URL}",
+    )
+    parser.add_argument(
+        "--probe-interval",
+        default=DEFAULT_OBSERVATORY_PROBE_INTERVAL,
+        help="Observatory probe interval. "
+             f"Default: {DEFAULT_OBSERVATORY_PROBE_INTERVAL}",
+    )
+    parser.add_argument(
         "--compact",
         action="store_true",
         help="Print compact JSON instead of pretty JSON.",
@@ -369,6 +407,8 @@ def main() -> int:
             relay_server_config=relay_server_config,
             endpoint_client_configs=endpoint_client_configs,
             apply_to_inbounds=apply_to_inbounds,
+            probe_url=args.probe_url,
+            probe_interval=args.probe_interval,
         )
 
         rendered = dump_json(patched, pretty=not args.compact)

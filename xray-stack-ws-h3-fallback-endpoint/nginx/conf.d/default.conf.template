@@ -17,12 +17,11 @@ server {
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
-    listen 443 quic reuseport;
+__NGINX_H3_LISTEN_FRAGMENT__
     server_name __DOMAIN__;
 
     http2 __NGINX_HTTP2__;
-    http3 __NGINX_HTTP3__;
-
+__NGINX_HTTP3_FRAGMENT__
     ssl_certificate /etc/letsencrypt/live/__DOMAIN__/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/__DOMAIN__/privkey.pem;
 
@@ -30,8 +29,7 @@ server {
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:10m;
 
-    add_header Alt-Svc 'h3=":443"; ma=__NGINX_ALTSVC_MAX_AGE__' always;
-    add_header QUIC-Status $http3 always;
+__NGINX_H3_HEADERS_FRAGMENT__
     add_header Strict-Transport-Security "max-age=__NGINX_HSTS_MAX_AGE__" always;
 
     root /usr/share/nginx/html;

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec "$ROOT_DIR/check-stack.sh" "$@"
+
+# Compatibility wrapper. The WS toolkit uses check-stack.sh as the main diagnostic entrypoint.
+exec "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/check-stack.sh" "$@"

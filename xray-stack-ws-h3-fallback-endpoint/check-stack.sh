@@ -32,14 +32,6 @@ print_file() {
   fi
 }
 
-XRAY_PATH_VALUE="${XRAY_PATH:-/ws}"
-if [[ "$XRAY_PATH_VALUE" != /* ]]; then
-  XRAY_PATH_VALUE="/$XRAY_PATH_VALUE"
-fi
-if [[ "$XRAY_PATH_VALUE" != "/" && "$XRAY_PATH_VALUE" == */ ]]; then
-  XRAY_PATH_VALUE="${XRAY_PATH_VALUE%/}"
-fi
-
 log "Recreate services"
 docker compose down || true
 docker compose up -d --force-recreate
@@ -56,7 +48,6 @@ print_file "environment" ".env"
 
 log "Xray config syntax"
 docker run --rm \
-  --network host \
   -v "$ROOT_DIR/xray:/usr/local/etc/xray:ro" \
   "$XRAY_IMAGE" \
   run -test -config /usr/local/etc/xray/config.json || true
@@ -69,40 +60,33 @@ docker run --rm "${NGINX_IMAGE}" nginx -V 2>&1 | tee /tmp/nginx-v.txt || true
 grep -- --with-http_v3_module /tmp/nginx-v.txt || true
 
 log "Generated nginx directives"
-grep -nE 'listen 80|listen 443|http2|http3|Alt-Svc|QUIC-Status|ssl_certificate|ssl_certificate_key|Upgrade|proxy_pass' nginx/conf.d/default.conf || true
+grep -nE 'listen 80|listen 443|http2|http3|Alt-Svc|QUIC-Status|ssl_certificate|ssl_certificate_key|location =|proxy_set_header Upgrade|proxy_pass' nginx/conf.d/default.conf || true
 
 log "Host listening sockets"
 ss -ltnp | grep ':443' || true
 ss -lunp | grep ':443' || true
 ss -ltnp | grep ':80' || true
 
-log "HTTP fallback redirect test"
+log "HTTP fallback test"
 curl -I --max-time 20 "http://${DOMAIN}" || true
 
-log "HTTPS fallback page test"
+log "HTTPS fallback test"
 curl -I --max-time 20 "https://${DOMAIN}" || true
-curl -sS --max-time 20 "https://${DOMAIN}" | sed -n '1,40p' || true
 
-log "WebSocket handshake test"
-curl -i --http1.1 --max-time 20 \
-  -H 'Connection: Upgrade' \
-  -H 'Upgrade: websocket' \
-  -H 'Sec-WebSocket-Version: 13' \
-  -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
-  "https://${DOMAIN}${XRAY_PATH_VALUE}" || true
+if [[ "${NGINX_HTTP3:-off}" == "on" ]]; then
+  log "HTTP/3 fallback page test with curl"
+  curl -I --http3 --max-time 20 "https://${DOMAIN}" || true
 
-log "HTTP/3 fallback page test with curl"
-curl -I --http3 --max-time 20 "https://${DOMAIN}" || true
+  log "QUIC status header"
+  curl -I --http3 --max-time 20 "https://${DOMAIN}" | grep -i 'quic-status' || true
 
-log "QUIC status header"
-curl -I --http3 --max-time 20 "https://${DOMAIN}" | grep -i 'quic-status' || true
-
-if [[ -f "check_h3.py" ]]; then
-  log "check_h3.py"
-  python3 check_h3.py "https://${DOMAIN}" || true
+  if [[ -f "check_h3.py" ]]; then
+    log "check_h3.py"
+    python3 check_h3.py "https://${DOMAIN}" || true
+  fi
 else
-  log "check_h3.py"
-  echo "check_h3.py not found, skipping"
+  log "HTTP/3 fallback test skipped"
+  echo "NGINX_HTTP3 is off."
 fi
 
 log "Container logs snapshot: xray"

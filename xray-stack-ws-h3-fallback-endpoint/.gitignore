@@ -1,1 +1,7 @@
-client-config.json
+.env
+certbot/conf/
+certbot/www/
+generated/
+xray/config.json
+nginx/conf.d/default.conf
+*.log

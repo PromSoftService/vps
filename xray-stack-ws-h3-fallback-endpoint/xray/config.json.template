@@ -1,0 +1,47 @@
+{
+  "log": {
+    "loglevel": "__XRAY_LOGLEVEL__"
+  },
+  "dns": {
+    "queryStrategy": "UseIPv4",
+    "servers": [
+      "__DOH_URL__",
+      "localhost"
+    ]
+  },
+  "inbounds": [
+    {
+      "tag": "in-vless-ws",
+      "listen": "0.0.0.0",
+      "port": __XRAY_PORT__,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "__XRAY_UUID__"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "__XRAY_PATH__"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
+}

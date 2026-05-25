@@ -1,0 +1,20 @@
+services:
+  xray:
+    image: ${XRAY_IMAGE}
+    container_name: xray
+    restart: unless-stopped
+    network_mode: host
+    user: "0:0"
+    cap_add:
+      - NET_BIND_SERVICE
+    volumes:
+      - ./xray:/usr/local/etc/xray:ro
+
+  nginx:
+    image: ${NGINX_IMAGE}
+    container_name: nginx
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./site:/usr/share/nginx/html:ro

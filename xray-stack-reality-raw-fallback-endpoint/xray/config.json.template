@@ -1,0 +1,52 @@
+{
+  "log": {
+    "loglevel": "__XRAY_LOGLEVEL__"
+  },
+  "inbounds": [
+    {
+      "tag": "in-vless-reality",
+      "listen": "0.0.0.0",
+      "port": __XRAY_PORT__,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "__XRAY_UUID__",
+            "flow": "__XRAY_FLOW__"
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+          {
+            "dest": __NGINX_FALLBACK_PORT__
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "raw",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "target": "__REALITY_TARGET__",
+          "serverNames": [__REALITY_SERVER_NAMES_JSON__],
+          "privateKey": "__REALITY_PRIVATE_KEY__",
+          "shortIds": ["__REALITY_SHORT_ID__"]
+        }__SERVER_SOCKOPT_FRAGMENT__
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
+}

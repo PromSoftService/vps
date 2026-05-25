@@ -1,0 +1,92 @@
+{
+  "remarks": "endtheh238.promsoftservice.online h3 fallback",
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "tag": "socks-in",
+      "listen": "127.0.0.1",
+      "port": 10808,
+      "protocol": "socks",
+      "settings": {
+        "udp": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+    {
+      "tag": "http-in",
+      "listen": "127.0.0.1",
+      "port": 10809,
+      "protocol": "http",
+      "settings": {}
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "endtheh238.promsoftservice.online",
+            "port": 443,
+            "users": [
+              {
+                "id": "c8e4a5dc-fbf0-4246-81fb-8582ebf2aa61",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "endtheh238.promsoftservice.online",
+          "fingerprint": "chrome",
+          "alpn": [
+            "h3",
+            "h2",
+            "http/1.1"
+          ]
+        },
+        "xhttpSettings": {
+          "path": "/api/v1/messages/",
+          "mode": "auto",
+          "extra": {
+            "headers": {
+              "User-Agent": "Mozilla/5.0",
+              "Accept": "*/*",
+              "Referer": "https://endtheh238.promsoftservice.online/"
+            },
+            "xPaddingBytes": "100-800"
+          }
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ],
+  "dns": {
+    "servers": [
+      "https://1.1.1.1/dns-query",
+      "localhost"
+    ],
+    "queryStrategy": "UseIPv4"
+  }
+}

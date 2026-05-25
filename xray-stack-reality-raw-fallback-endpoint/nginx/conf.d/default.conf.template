@@ -1,0 +1,12 @@
+server {
+    listen 127.0.0.1:__NGINX_FALLBACK_PORT__;
+    listen [::1]:__NGINX_FALLBACK_PORT__;
+    server_name __NGINX_SERVER_NAME__;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}

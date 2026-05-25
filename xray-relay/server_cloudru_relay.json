@@ -1,0 +1,148 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "dns": {
+    "servers": [
+      "https://1.1.1.1/dns-query"
+    ]
+  },
+  "inbounds": [
+    {
+      "tag": "in-vless-xhttp",
+      "listen": "0.0.0.0",
+      "port": 10000,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "26a03255-1531-4fb9-9577-d2be076d1d31"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": {
+          "path": "/api/v1/messages/",
+          "mode": "auto",
+          "extra": {
+            "headers": {
+              "User-Agent": "Mozilla/5.0",
+              "Accept": "*/*",
+              "Referer": "https://relclru235.promsoftservice.ru/"
+            },
+            "xPaddingBytes": "100-800"
+          }
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    },
+    {
+      "tag": "relay-endtheh238promsoftserviceonline-h3-fallback",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "endtheh238.promsoftservice.online",
+            "port": 443,
+            "users": [
+              {
+                "id": "c8e4a5dc-fbf0-4246-81fb-8582ebf2aa61",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "endtheh238.promsoftservice.online",
+          "fingerprint": "chrome",
+          "alpn": [
+            "h3",
+            "h2",
+            "http/1.1"
+          ]
+        },
+        "xhttpSettings": {
+          "path": "/api/v1/messages/",
+          "mode": "auto",
+          "extra": {
+            "headers": {
+              "User-Agent": "Mozilla/5.0",
+              "Accept": "*/*",
+              "Referer": "https://endtheh238.promsoftservice.online/"
+            },
+            "xPaddingBytes": "100-800"
+          }
+        }
+      }
+    },
+    {
+      "tag": "relay-hostkey-endpoint",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "endphost173.promsoftservice.online",
+            "port": 443,
+            "users": [
+              {
+                "id": "dcf554a7-a5e5-4d73-8764-77490fe85a25",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "raw",
+        "security": "reality",
+        "realitySettings": {
+          "serverName": "www.ozon.ru",
+          "fingerprint": "chrome",
+          "shortId": "b483e0af5d24e0ab",
+          "spiderX": "/",
+          "publicKey": "XWGxmHex8GHfZ5pPdNO7slq8KJiF89Eg53UWCdX-Yys"
+        }
+      }
+    }
+  ],
+  "routing": {
+    "balancers": [
+      {
+        "tag": "relay-balancer",
+        "selector": [
+          "relay-endtheh238promsoftserviceonline-h3-fallback",
+          "relay-hostkey-endpoint"
+        ],
+        "strategy": {
+          "type": "roundRobin"
+        }
+      }
+    ],
+    "rules": [
+      {
+        "type": "field",
+        "balancerTag": "relay-balancer",
+        "__relay_generated__": true,
+        "inboundTag": [
+          "in-vless-xhttp"
+        ]
+      }
+    ]
+  }
+}

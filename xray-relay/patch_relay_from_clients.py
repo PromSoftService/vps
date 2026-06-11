@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# py patch_relay_from_clients.py --relay-server-config ./server_cloudru_endpoint.json --endpoint-client-config ./client_thehosting.json ./client_hostkey.json --output ./server_cloudru_relay.json
+# py patch_relay_from_clients.py --relay-server-config ./server_cloudru_endpoint.json --endpoint-client-config ./client_avps.json ./client_hostkey.json --output ./server_cloudru_relay.json
 
 from __future__ import annotations
 

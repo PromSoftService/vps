@@ -1,5 +1,5 @@
 {
-  "remarks": "endtheh238.promsoftservice.online h3 fallback",
+  "remarks": "avpsendp149.dns.navy h3 fallback",
   "log": {
     "loglevel": "warning"
   },
@@ -36,11 +36,11 @@
       "settings": {
         "vnext": [
           {
-            "address": "endtheh238.promsoftservice.online",
+            "address": "avpsendp149.dns.navy",
             "port": 443,
             "users": [
               {
-                "id": "c8e4a5dc-fbf0-4246-81fb-8582ebf2aa61",
+                "id": "25a77266-3c84-4bdb-b254-a4567f87c724",
                 "encryption": "none"
               }
             ]
@@ -51,7 +51,7 @@
         "network": "xhttp",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "endtheh238.promsoftservice.online",
+          "serverName": "avpsendp149.dns.navy",
           "fingerprint": "chrome",
           "alpn": [
             "h3",
@@ -60,16 +60,8 @@
           ]
         },
         "xhttpSettings": {
-          "path": "/api/v1/messages/",
-          "mode": "auto",
-          "extra": {
-            "headers": {
-              "User-Agent": "Mozilla/5.0",
-              "Accept": "*/*",
-              "Referer": "https://endtheh238.promsoftservice.online/"
-            },
-            "xPaddingBytes": "100-800"
-          }
+          "path": "/messages/log/v1/",
+          "mode": "auto"
         }
       }
     },

@@ -44,16 +44,16 @@
       "protocol": "blackhole"
     },
     {
-      "tag": "relay-endtheh238promsoftserviceonline-h3-fallback",
+      "tag": "relay-avpsendp149dnsnavy-h3-fallback",
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "endtheh238.promsoftservice.online",
+            "address": "avpsendp149.dns.navy",
             "port": 443,
             "users": [
               {
-                "id": "c8e4a5dc-fbf0-4246-81fb-8582ebf2aa61",
+                "id": "25a77266-3c84-4bdb-b254-a4567f87c724",
                 "encryption": "none"
               }
             ]
@@ -64,7 +64,7 @@
         "network": "xhttp",
         "security": "tls",
         "tlsSettings": {
-          "serverName": "endtheh238.promsoftservice.online",
+          "serverName": "avpsendp149.dns.navy",
           "fingerprint": "chrome",
           "alpn": [
             "h3",
@@ -73,26 +73,18 @@
           ]
         },
         "xhttpSettings": {
-          "path": "/api/v1/messages/",
-          "mode": "auto",
-          "extra": {
-            "headers": {
-              "User-Agent": "Mozilla/5.0",
-              "Accept": "*/*",
-              "Referer": "https://endtheh238.promsoftservice.online/"
-            },
-            "xPaddingBytes": "100-800"
-          }
+          "path": "/messages/log/v1/",
+          "mode": "auto"
         }
       }
     },
     {
-      "tag": "relay-hostkey-endpoint",
+      "tag": "relay-endphost173dnsarmy-reality-raw",
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "endphost173.promsoftservice.online",
+            "address": "endphost173.dns.army",
             "port": 443,
             "users": [
               {
@@ -110,9 +102,9 @@
         "realitySettings": {
           "serverName": "www.ozon.ru",
           "fingerprint": "chrome",
-          "shortId": "b483e0af5d24e0ab",
+          "shortId": "389643ae21b51ac1",
           "spiderX": "/",
-          "publicKey": "XWGxmHex8GHfZ5pPdNO7slq8KJiF89Eg53UWCdX-Yys"
+          "publicKey": "BNrrBOv94cqqVQEDlHuaP7Rpln2-H5w2MnsyltIyjBY"
         }
       }
     }
@@ -122,8 +114,8 @@
       {
         "tag": "relay-balancer",
         "selector": [
-          "relay-endtheh238promsoftserviceonline-h3-fallback",
-          "relay-hostkey-endpoint"
+          "relay-avpsendp149dnsnavy-h3-fallback",
+          "relay-endphost173dnsarmy-reality-raw"
         ],
         "strategy": {
           "type": "leastPing"
@@ -143,8 +135,8 @@
   },
   "observatory": {
     "subjectSelector": [
-      "relay-endtheh238promsoftserviceonline-h3-fallback",
-      "relay-hostkey-endpoint"
+      "relay-avpsendp149dnsnavy-h3-fallback",
+      "relay-endphost173dnsarmy-reality-raw"
     ],
     "probeUrl": "https://www.google.com/generate_204",
     "probeInterval": "10s",

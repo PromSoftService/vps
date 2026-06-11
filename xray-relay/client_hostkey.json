@@ -1,5 +1,5 @@
 {
-  "remarks": "HOSTKEY ENDPOINT",
+  "remarks": "endphost173.dns.army reality raw",
   "log": {
     "loglevel": "warning"
   },
@@ -44,7 +44,7 @@
       "settings": {
         "vnext": [
           {
-            "address": "endphost173.promsoftservice.online",
+            "address": "endphost173.dns.army",
             "port": 443,
             "users": [
               {
@@ -62,8 +62,8 @@
         "realitySettings": {
           "serverName": "www.ozon.ru",
           "fingerprint": "chrome",
-          "password": "XWGxmHex8GHfZ5pPdNO7slq8KJiF89Eg53UWCdX-Yys",
-          "shortId": "b483e0af5d24e0ab",
+          "password": "BNrrBOv94cqqVQEDlHuaP7Rpln2-H5w2MnsyltIyjBY",
+          "shortId": "389643ae21b51ac1",
           "spiderX": "/"
         }
       }

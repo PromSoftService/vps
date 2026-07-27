@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 
@@ -19,8 +20,21 @@ def parse_alpn(raw: str) -> list[str]:
     return values or ["http/1.1"]
 
 
+
+def normalize_ws_path(value: str) -> str:
+    path = value.strip()
+    if not path:
+        return "/ws"
+    if not path.startswith("/"):
+        path = "/" + path
+    if path != "/":
+        path = path.rstrip("/")
+    return path
+
+
 def build_config(
     domain: str,
+    address: str,
     uuid: str,
     path: str,
     doh: str | None,
@@ -44,13 +58,13 @@ def build_config(
         "settings": {
             "vnext": [
                 {
-                    "address": domain,
+                    # Connection target. May be an IP address even when TLS uses a domain.
+                    "address": address,
                     "port": 443,
                     "users": [
                         {
                             "id": uuid,
                             "encryption": "none",
-                            "security": "auto",
                             "level": 8,
                         }
                     ],
@@ -61,6 +75,7 @@ def build_config(
             "network": "ws",
             "security": "tls",
             "tlsSettings": {
+                # Keep the certificate/SNI name separate from the connection address.
                 "serverName": domain,
                 "fingerprint": fingerprint,
                 "allowInsecure": False,
@@ -69,6 +84,7 @@ def build_config(
             "wsSettings": {
                 "path": path,
                 "headers": {
+                    # nginx virtual host must still receive the TLS domain.
                     "Host": domain,
                 },
             },
@@ -167,9 +183,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Generate client config for VLESS + WS + TLS endpoint."
     )
-    parser.add_argument("domain", help="Server domain")
+    parser.add_argument("domain", help="TLS SNI and WebSocket Host domain")
     parser.add_argument("uuid", help="Client UUID")
     parser.add_argument("path", help="WebSocket path")
+    parser.add_argument(
+        "--address",
+        default=os.environ.get("CLIENT_ADDRESS"),
+        help=(
+            "Connection address (IP or hostname). Defaults to the CLIENT_ADDRESS "
+            "environment variable, then to domain."
+        ),
+    )
     parser.add_argument("--doh", default=None, help="Optional DoH server URL")
     parser.add_argument("--remark", default="ws tls fallback", help="Human-readable config remark")
     parser.add_argument("--fingerprint", default="chrome", help="uTLS fingerprint")
@@ -184,10 +208,17 @@ def main() -> int:
 
     args = parser.parse_args()
 
+    address = (args.address or args.domain).strip()
+    if not address:
+        raise SystemExit("Connection address is empty")
+
+    path = normalize_ws_path(args.path)
+
     config = build_config(
         domain=args.domain,
+        address=address,
         uuid=args.uuid,
-        path=args.path,
+        path=path,
         doh=args.doh,
         remark=args.remark,
         fingerprint=args.fingerprint,
@@ -202,8 +233,14 @@ def main() -> int:
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_path.write_text(
+        json.dumps(config, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     print(f"Config written to: {output_path}")
+    print(f"Connection address: {address}")
+    print(f"TLS SNI / WS Host: {args.domain}")
+    print(f"WebSocket path: {path}")
     return 0
 
 
